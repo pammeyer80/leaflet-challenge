@@ -9,7 +9,26 @@ d3.json(queryUrl).then(function(data) {
     createFeatures(data.features);
   });
 
+  function chooseColor(depth) {
+    switch(true){
+      case depth >= 90:
+        return "red";
+      case depth >= 70:
+        return "darkorange";
+      case depth >= 50:
+        return "orange";
+      case depth >=30:
+        return "gold"
+      case depth >=10:
+        return "greenyellow";
+      default: 
+        return "lime";
+    }
+
+  }
+
 function createFeatures(earthquakeData) {
+
 
     // Define a function we want to run once for each feature in the features array
     // Give each feature a popup describing the place and time of the earthquake
@@ -17,18 +36,52 @@ function createFeatures(earthquakeData) {
       layer.bindPopup("<h3>" + feature.properties.place +
         "</h3><hr><p>" + new Date(feature.properties.time) + "</p>");
     }
+
+
+
+    function pointToLayer(feature, latlng) {
+        return L.circleMarker(latlng,  {
+          radius: feature.properties.mag*3,
+          fillColor: chooseColor(feature.geometry.coordinates[2]),
+          color: "#000",
+          weight: .25,
+          opacity: 1,
+          fillOpacity: 0.8
+        });
+    }
+    
   
     // Create a GeoJSON layer containing the features array on the earthquakeData object
     // Run the onEachFeature function once for each piece of data in the array
     var earthquakes = L.geoJSON(earthquakeData, {
-      onEachFeature: onEachFeature
+      onEachFeature: onEachFeature,
+      pointToLayer: pointToLayer
     });
   
     // Sending our earthquakes layer to the createMap function
     createMap(earthquakes);
   }
 
-  function createMap(earthquakes) {
+    function createMap(earthquakes) {
+      //var legend = L.control({ position: 'bottomright' }).addTo(myMap);
+
+      // legend.onAdd = function (myMap) {
+
+      //   var div = L.DomUtil.create('div', 'info legend'),
+      //     depths = [0, 10, 30, 50, 70, 90],
+      //     labels = ["-10-10", "10-30", "30-50", "50-70", "70-90", "90+"];
+
+      //   // loop through our density intervals and generate a label with a colored square for each interval
+      //   for (var i = 0; i < depths.length; i++) {
+      //     div.innerHTML +=
+      //       '<i style="background:' + chooseColor(depths[i] + 1) + '"></i> ' +
+      //       depths[i] + (depths[i + 1] ? '&ndash;' + depths[i + 1] + '<br>' : '+');
+      //   }
+
+      //   return div;
+      // };
+
+      
 
     // Define streetmap and darkmap layers
     var streetmap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
@@ -74,3 +127,4 @@ function createFeatures(earthquakeData) {
       collapsed: false
     }).addTo(myMap);
   }
+
