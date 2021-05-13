@@ -63,25 +63,7 @@ function createFeatures(earthquakeData) {
   }
 
     function createMap(earthquakes) {
-      //var legend = L.control({ position: 'bottomright' }).addTo(myMap);
-
-      // legend.onAdd = function (myMap) {
-
-      //   var div = L.DomUtil.create('div', 'info legend'),
-      //     depths = [0, 10, 30, 50, 70, 90],
-      //     labels = ["-10-10", "10-30", "30-50", "50-70", "70-90", "90+"];
-
-      //   // loop through our density intervals and generate a label with a colored square for each interval
-      //   for (var i = 0; i < depths.length; i++) {
-      //     div.innerHTML +=
-      //       '<i style="background:' + chooseColor(depths[i] + 1) + '"></i> ' +
-      //       depths[i] + (depths[i + 1] ? '&ndash;' + depths[i + 1] + '<br>' : '+');
-      //   }
-
-      //   return div;
-      // };
-
-      
+           
 
     // Define streetmap and darkmap layers
     var streetmap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
@@ -112,19 +94,47 @@ function createFeatures(earthquakeData) {
     };
   
     // Create our map, giving it the streetmap and earthquakes layers to display on load
-    var myMap = L.map("map", {
+    var map = L.map("map", {
       center: [
         37.09, -95.71
       ],
       zoom: 5,
       layers: [streetmap, earthquakes]
     });
+
+    //map.legendControl.addLegend(document.getElementById('legend').innerHTML);
   
     // Create a layer control
     // Pass in our baseMaps and overlayMaps
     // Add the layer control to the map
     L.control.layers(baseMaps, overlayMaps, {
       collapsed: false
-    }).addTo(myMap);
+    }).addTo(map);
+
+    addLegend(map);
+    
   }
+
+  function addLegend(map) {
+
+    var legend = L.control({ position: 'bottomright' });
+
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend'),
+         labels = ["-10", "10", "30", "50", "70", "90"]
+ 
+          div.innerHTML = "";
+
+        // loop through our density intervals and generate a label with a colored square for each interval
+        for (var i = 0; i < labels.length; i++) {
+          div.innerHTML +=
+          '<i style="background:' + chooseColor(parseInt(labels[i]) + 1) + '"></i> ' +
+          labels[i] + (labels[i + 1] ? '&ndash;' + labels[i + 1] + '<br>' : '+');
+        }
+
+        return div;
+      };
+    legend.addTo(map);
+
+  };
 
